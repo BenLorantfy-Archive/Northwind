@@ -1,0 +1,158 @@
+*{
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;	
+}
+
+html,body {
+	position: absolute;
+	top:0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	margin:0;
+	padding: 0;
+	font-family: Helvetica, sans-serif;
+		
+	background: url(../images/background.jpg) no-repeat center center fixed; 
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+}
+
+h1{
+	color: white;
+	padding:0;
+	margin: 0;
+}
+
+h2{
+	color: lightgray;
+	padding:0;
+	margin: 0;
+	font-size: 20px;
+}
+
+#site-container{
+	margin: auto;
+	width: 70%;
+	min-height: 100%;
+	background-color: rgba(0,0,0,0.3);
+	padding-left: 2%;
+	padding-right: 2%;
+}
+
+.dark-textbox{
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	outline:none;
+	
+	width:80%;
+	background: rgba(0,0,0,0.3);
+	border: 1px solid rgba(0,0,0,0.3);
+	font-size: 22px;
+	padding:10px;
+	color: rgba(170,179,182,0.7);
+	margin:10px;
+	border-radius: 4px;
+}
+
+.dark-button{
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	outline:none;
+}
+
+.arrow{
+	position: relative;
+	top: -1px;
+	font-size: 9px;
+}
+
+/* ======================================
+ *               index.php
+ * ====================================== */
+#login-container{
+	position: relative;
+	height: 400px;
+	width: 350px;
+	max-width: 100%;
+	top:100px;
+	
+	margin: auto;
+	background: rgba(0,0,0,0.3);
+	border-radius: 10px;
+	padding:20px;
+	text-align: center;
+}
+
+/* ======================================
+ *               admin.php
+ * ====================================== */
+#recordTable{
+	table-layout: fixed;
+	color: white;
+	width: 100%;
+	border-spacing: 0;
+	border-collapse: separate;
+}
+
+#recordTable td{
+	padding:0;
+	margin: 0;
+}
+
+#recordTable thead td{
+	padding:10px;
+}
+
+#recordTable thead, #records tr:nth-child(even){
+	background-color: rgba(170,179,182,0.7);
+}
+
+#records td a{
+	display: block;
+	width: 100%;
+	height: 100%;
+	padding: 10px;
+	margin:0;
+	color:inherit;
+	text-decoration: none;
+}
+
+#title{
+	padding-top: 20px;
+}
+
+#subtitle{
+	padding-bottom: 20px;
+}
+
+#IDHeader{
+	width: 10%;
+}
+
+#cityHeader{
+	width: 20%;
+}
+
+#contactHeader{
+	width: 30%;
+}
+
+#checkAll{
+	width: 40px;
+	text-align: center;
+	padding: 0;
+}
+
+#noResults td{
+	text-align: center;
+}
+
+#search, #new, #delete{
+	display: inline-block;
+}
