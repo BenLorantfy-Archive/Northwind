@@ -115,4 +115,5 @@ if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
 	$admin->$_POST["call"]();
 }
 
+
 ?>
