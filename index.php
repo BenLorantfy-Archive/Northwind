@@ -3,15 +3,20 @@
 	include("php/admin.class.php");
 	$admin = new Admin("php/connect.php");
 	if($admin->isLogged()){
-		header("Location: list.php");
-		die();
+		if(isset($_GET["logout"])){
+			$admin->logout();
+			header("Location: ./");
+		}else{
+			header("Location: list.php");
+			die();			
+		}
 	}
 	
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<?php include("php/header.php"); ?>
+	<?php include("php/head.php"); ?>
 </head>
 <body data-page = "login">
 	<div id = "login-container">

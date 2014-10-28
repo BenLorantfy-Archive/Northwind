@@ -68,6 +68,10 @@ class Admin{
 		return $this->result($isLogged);
 	}
 	
+	function logout(){
+		session_destroy();
+	}
+	
 	function isLogged(){
 		$isLogged = false;
 		

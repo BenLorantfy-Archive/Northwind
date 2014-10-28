@@ -1,7 +1,5 @@
 <?php
 
-
-
 //Handle AJAX
 if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
 	require_once("admin.class.php");
