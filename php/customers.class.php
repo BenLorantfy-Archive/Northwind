@@ -69,7 +69,7 @@ class Customers{
 				$direction = "DESC";
 			}
 			
-			$result = $db->query("SELECT * FROM customers WHERE CompanyName LIKE '%$search%' ORDER BY $order $direction");
+			$result = $db->query("SELECT * FROM Customers WHERE CompanyName LIKE '%$search%' ORDER BY $order $direction");
 			
 	
 			while($row = $result->fetch_assoc()){
@@ -98,7 +98,7 @@ class Customers{
 		if($this->admin->isLogged()){
 			require("sanitize.php");
 			$db = $this->db;
-			$result = $db->query("SELECT * FROM customers WHERE CustomerID = '$id' LIMIT 1");
+			$result = $db->query("SELECT * FROM Customers WHERE CustomerID = '$id' LIMIT 1");
 			return $this->result($result->fetch_assoc());
 		}
 	}
