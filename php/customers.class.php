@@ -103,6 +103,37 @@ class Customers{
 		}
 	}
 	
+	function updateCustomer($id="",$contactName="",$contactTitle="",$address="",$city="",$region="",$postalCode="",$country="",$phone="",$fax=""){
+		if($this->admin->isLogged()){
+			require("sanitize.php");
+			$db = $this->db;
+			
+			$contactNameUpdate 	= $contactName 	!= "" ? "ContactName = '$contactName'" 	: "ContactName = NULL";
+			$contactTitleUpdate = $contactTitle != "" ? "ContactTitle = '$contactTitle'": "ContactTitle = NULL";
+			$addressUpdate 		= $address 		!= "" ? "Address = '$address'" 			: "Address = NULL";
+			$cityUpdate			= $city 		!= "" ? "City = '$city'" 				: "City = NULL";
+			$regionUpdate		= $region	 	!= "" ? "Region = '$region'" 			: "Region = NULL";
+			$postalCodeUpdate	= $postalCode 	!= "" ? "PostalCode = '$postalCode'" 	: "PostalCode = NULL";
+			$countryUpdate		= $country 		!= "" ? "Country = '$country'" 			: "Country = NULL";
+			$phoneUpdate 		= $phone 		!= "" ? "Phone = '$phone'" 				: "Phone = NULL";
+			$fax 				= $fax 			!= "" ? "Fax = '$fax'" 					: "Fax = NULL";
+			
+			$result = $db->query("UPDATE Customers SET 
+				 $contactNameUpdate
+				,$contactTitleUpdate
+				,$addressUpdate
+				,$cityUpdate
+				,$regionUpdate
+				,$postalCodeUpdate
+				,$countryUpdate
+				,$phoneUpdate
+				,$fax
+				WHERE CustomerID = '$id'
+			");
+		}
+		return $this->result(true);
+	}
+	
 	function result($returnData=""){
 		if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
 			if(is_string($returnData)){

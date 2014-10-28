@@ -11,13 +11,14 @@
 <!DOCTYPE>
 <html>
 <head>
-	<?php include("php/head.php"); ?>
+	<?php include("head.php"); ?>
 </head>
 <body data-page = "new">
 	<div id = "site-container">
-		<?php include("php/nav.php"); ?>
+		<?php include("nav.php"); ?>
 		<div id = "content-container">
 			<h3>Add New Customer</h3>
+			<a id = "back-button" class = "dark-button" href = "list.php">Back</a>
 		</div>	
 	</div>
 </body>
