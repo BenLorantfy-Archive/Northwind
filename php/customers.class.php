@@ -55,7 +55,7 @@ class Customers{
 		$this->admin = new Admin($this->connect,$this->db);
 	}
 	
-	function getTableRows($order, $search, $reverse){
+	function getTableRows($order="", $search="", $reverse=""){
 		if($this->admin->isLogged()){
 			require("sanitize.php");
 			$reverse = is_string($reverse) ? $reverse == "true" : $reverse;
@@ -94,7 +94,7 @@ class Customers{
 		}
 	}
 	
-	function getCustomer($id){
+	function getCustomer($id=""){
 		if($this->admin->isLogged()){
 			require("sanitize.php");
 			$db = $this->db;
@@ -103,7 +103,7 @@ class Customers{
 		}
 	}
 	
-	function result($returnData){
+	function result($returnData=""){
 		if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
 			if(is_string($returnData)){
 				echo $returnData;

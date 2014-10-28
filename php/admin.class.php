@@ -92,7 +92,7 @@ class Admin{
 		return $this->result($isLogged);
 	}
 	
-	function result($returnData){
+	function result($returnData=""){
 		if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
 			if(is_string($returnData)){
 				echo $returnData;
