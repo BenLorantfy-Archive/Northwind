@@ -12,11 +12,11 @@
 <!DOCTYPE>
 <html>
 <head>
-	<?php include("php/head.php"); ?>
+	<?php include("head.php"); ?>
 </head>
 <body data-page = "list">
 	<div id = "site-container">
-		<?php include("php/nav.php"); ?>
+		<?php include("nav.php"); ?>
 		<div id = "content-container">
 			<h3>Customer List</h3>
 			<div id = "tools">

@@ -12,6 +12,10 @@ var NorthWind = (function(){
 		}else if(page == "list"){
 			displayRecordsEvent();
 			clearInput();
+		}else if(page == "customer"){
+			editEvent();
+			cancelEvent();
+			saveEvent();
 		}
 	}
 	
@@ -97,6 +101,71 @@ var NorthWind = (function(){
 		}
 	}
 	
+	function editEvent(){
+		$("#edit-button").click(function(){
+			$(".infoContainer").each(function(){
+				$(this).find(".info").hide();
+				$(this).find(".infoTextbox").show();
+			})	
+			$("#edit-button").hide();
+			$("#cancel-button").show();
+			$("#save-button").show();
+		})
+	}
+
+	function cancelEvent(){
+		$("#cancel-button").click(function(){
+			$(".infoContainer").each(function(){
+				var info = $(this).find(".info");
+				var infoTextbox = $(this).find(".infoTextbox");
+				var newInfoTextboxVal = info.html() == "unspecified" ? "" : info.html();
+				info.show();
+				infoTextbox.val(newInfoTextboxVal).hide();			
+			})		
+			$("#edit-button").show();
+			$("#cancel-button").hide();
+			$("#save-button").hide();
+		});
+	}
+	
+
+	function saveEvent(){
+		$("#save-button").click(function(){
+			$.post("php/customers.class.php",{ 
+				 call			: "updateCustomer"
+				,id				: $("#customer-id").html()
+				,contactName	: $("#contact-name-input").val()
+				,contactTitle	: $("#contact-title-input").val()
+				,address		: $("#address-input").val()
+				,city			: $("#city-input").val()
+				,region			: $("#region-input").val()
+				,postalCode		: $("#postal-code-input").val()
+				,country		: $("#country-input").val()
+				,phone			: $("#phone-input").val()
+				,fax			: $("#fax-input").val()
+			}, function(data) {	
+				data = data == "true";
+				if(data){
+					MsgBox.success("Saved");
+					$(".infoContainer").each(function(){
+						var info = $(this).find(".info");
+						var infoTextbox = $(this).find(".infoTextbox");
+						var newInfo = infoTextbox.val() == "" ? "unspecified" : infoTextbox.val();
+						info.html(newInfo);
+						infoTextbox.hide();
+						info.show();					
+					});					
+					$("#edit-button").show();
+					$("#cancel-button").hide();
+					$("#save-button").hide();			
+				}else{
+					MsgBox.error("Invalid");
+				}
+			});			
+		})
+	}
+	
+
 	
 	return {
 		run:run

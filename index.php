@@ -16,7 +16,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<?php include("php/head.php"); ?>
+	<?php include("head.php"); ?>
 </head>
 <body data-page = "login">
 	<div id = "login-container">
