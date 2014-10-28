@@ -20,6 +20,11 @@ html,body {
 	background-size: cover;
 }
 
+a{
+	text-decoration: none;
+	color: inherit;
+}
+
 h1{
 	color: white;
 	padding:0;
@@ -55,6 +60,7 @@ h4{
 }
 
 #title-container,#content-container{
+	position: relative;
 	width: 100%;
 	background-color: rgba(0,0,0,0.4);
 	padding:20px;
@@ -103,6 +109,13 @@ h4{
 	position: relative;
 	top: -1px;
 	font-size: 9px;
+}
+
+#logout-button{
+	position: absolute;
+	right:20px;
+	top:20px;
+	color: white;
 }
 
 /* ======================================
