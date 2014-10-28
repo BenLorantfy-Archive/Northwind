@@ -96,6 +96,15 @@ class Customers{
 		}
 	}
 	
+	function getCustomer($id){
+		if($this->admin->isLogged()){
+			require("sanitize.php");
+			$db = $this->db;
+			$result = $db->query("SELECT * FROM customers WHERE CustomerID = '$id' LIMIT 1");
+			return $this->result($result->fetch_assoc());
+		}
+	}
+	
 	function result($returnData){
 		if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
 			if(is_string($returnData)){

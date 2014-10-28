@@ -12,8 +12,7 @@ html,body {
 	height: 100%;
 	margin:0;
 	padding: 0;
-	font-family: Helvetica, sans-serif;
-		
+	font-family: Helvetica, sans-serif;		
 	background: url(../images/background.jpg) no-repeat center center fixed; 
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
@@ -34,36 +33,70 @@ h2{
 	font-size: 20px;
 }
 
+h3{
+	color:white;
+	padding:0;
+	margin:0;
+	font-size:24px;
+}
+
+h4{
+	color:white;
+	padding:0;
+	margin:0;
+	font-size:16px;	
+	color:lightgrey;
+}
+
 #site-container{
 	margin: auto;
 	width: 70%;
 	min-height: 100%;
-	background-color: rgba(0,0,0,0.3);
-	padding-left: 2%;
-	padding-right: 2%;
 }
 
-.dark-textbox{
+#title-container,#content-container{
+	width: 100%;
+	background-color: rgba(0,0,0,0.4);
+	padding:20px;
+	margin-top:20px;
+	border-radius: 3px;
+}
+
+#title-container{
+	height: 15%;
+}
+
+#content-container{
+	margin-bottom: 20px;
+}
+
+.dark-textbox, .dark-button{
 	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	outline:none;
+	text-decoration: none;
+	display: inline-block;
 	
 	width:80%;
-	background: rgba(0,0,0,0.3);
-	border: 1px solid rgba(0,0,0,0.3);
-	font-size: 22px;
+	background: rgba(0,0,0,0.4);
+	border: 1px solid rgba(0,0,0,0.4);
+	font-size: 18px;
 	padding:10px;
-	color: rgba(170,179,182,0.7);
-	margin:10px;
+	color: white;
 	border-radius: 4px;
 }
 
+.dark-textbox:focus{
+	background: rgba(0,0,0,0.5);
+}
+
 .dark-button{
-	appearance: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	outline:none;
+	cursor: pointer;
+}
+
+.dark-button:hover{
+	background: rgba(0,0,0,0.5);
 }
 
 .arrow{
@@ -77,16 +110,28 @@ h2{
  * ====================================== */
 #login-container{
 	position: relative;
-	height: 400px;
-	width: 350px;
+	width: 330px;
 	max-width: 100%;
 	top:100px;
 	
 	margin: auto;
-	background: rgba(0,0,0,0.3);
+	background: rgba(0,0,0,0.4);
 	border-radius: 10px;
 	padding:20px;
 	text-align: center;
+}
+
+#username{
+	margin-top:30px;
+}
+
+#password{
+	margin-top:10px;
+}
+
+#login-button{
+	margin-top:20px;
+	margin-bottom: 20px;
 }
 
 /* ======================================
@@ -123,14 +168,6 @@ h2{
 	text-decoration: none;
 }
 
-#title{
-	padding-top: 20px;
-}
-
-#subtitle{
-	padding-bottom: 20px;
-}
-
 #IDHeader{
 	width: 10%;
 }
@@ -151,8 +188,36 @@ h2{
 
 #noResults td{
 	text-align: center;
+	padding-top: 20px;
 }
 
 #search, #new, #delete{
 	display: inline-block;
+}
+
+#search{
+	width: 89%;
+}
+
+#new{
+	margin-left: 1%;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+#delete{
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;	
+	border-left: none;
+}
+
+#new, #delete{
+	text-align: center;
+	font-size:18px;
+	width: 5%;
+}
+
+#tools{
+	margin-bottom: 20px;
+	margin-top:20px;
 }

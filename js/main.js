@@ -9,7 +9,7 @@ var NorthWind = (function(){
 		var page = $("body").data("page");
 		if(page == "login"){
 			loginEvent();	
-		}else if(page == "admin"){
+		}else if(page == "list"){
 			displayRecordsEvent();
 			clearInput();
 		}
@@ -34,7 +34,7 @@ var NorthWind = (function(){
 			}, function(data) {	
 				data = data == "true";
 				if(data){
-					window.location = "admin.php";
+					window.location = "list.php";
 				}else{
 					MsgBox.error("Invalid Credentials");
 				}

@@ -3,7 +3,7 @@
 	include("php/admin.class.php");
 	$admin = new Admin("php/connect.php");
 	if($admin->isLogged()){
-		header("Location: admin.php");
+		header("Location: list.php");
 		die();
 	}
 	
@@ -15,9 +15,10 @@
 </head>
 <body data-page = "login">
 	<div id = "login-container">
-		 <input id = "username" class = "dark-textbox" type = "text"></input>
-		 <input id = "password" class = "dark-textbox" type = "password"></input>
-		 <input id = "login-button" class = "dark-textbox" type = "button"  value = "Login"></input>
+		<h1>Northwind<br/>Admin Panel</h1>
+		<input id = "username" class = "dark-textbox" type = "text"></input>
+		<input id = "password" class = "dark-textbox" type = "password"></input>
+		<input id = "login-button" class = "dark-textbox" type = "button"  value = "Login"></input>
 	</div>
 </body>
 </html>
