@@ -53,6 +53,10 @@ h4{
 	color:lightgrey;
 }
 
+.clear{
+	clear: both;
+}
+
 #logo-container{
 	display: block;
 	width: 180px;
@@ -89,13 +93,27 @@ h4{
 	text-decoration: none;
 	display: inline-block;
 	
-	width:80%;
 	background: rgba(0,0,0,0.4);
 	border: 1px solid rgba(0,0,0,0.4);
 	font-size: 18px;
 	padding:10px;
 	color: white;
 	border-radius: 4px;
+}
+
+.dark-button{
+	/* solves problem where stuff is selected when double clicked */
+	-webkit-user-select: none;  
+	-moz-user-select: none;     
+	-ms-user-select: none;      
+	-o-user-select: none;
+	user-select: none;    
+	
+	min-width: 100px;      
+}
+
+#username,#password{
+	width: 80%;
 }
 
 .dark-textbox:focus{
@@ -151,6 +169,7 @@ h4{
 #login-button{
 	margin-top:20px;
 	margin-bottom: 20px;
+	width: 40%;
 }
 
 #back-button{
@@ -173,6 +192,15 @@ h4{
 	margin: 0;
 }
 
+#recordTable thead{
+	/* solves problem where header is selected when double clicked */
+	-webkit-user-select: none;  
+	-moz-user-select: none;     
+	-ms-user-select: none;      
+	-o-user-select: none;
+	user-select: none;   	
+}
+
 #recordTable thead td{
 	padding:10px;
 }
@@ -190,6 +218,7 @@ h4{
 	color:inherit;
 	text-decoration: none;
 }
+
 
 #IDHeader{
 	width: 10%;
@@ -237,7 +266,7 @@ h4{
 #new, #delete{
 	text-align: center;
 	font-size:18px;
-	width: 5%;
+	min-width: 5%;
 }
 
 #tools{
@@ -254,7 +283,7 @@ h4{
 }
 
 .infoLabel{
-	min-width: 120px;
+	min-width: 140px;
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -272,7 +301,7 @@ h4{
 .createInfoHeight{
 	display: inline-block;
 	vertical-align: middle;
-	height:35px;
+	height:40px;
 }
 
 #customer-id{
@@ -281,8 +310,4 @@ h4{
 
 #edit-tools{
 	margin-top: 10px;	
-}
-
-#edit-button, #save-button, #cancel-button, #back-button{
-	width: 100px;
 }
