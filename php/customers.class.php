@@ -1,58 +1,39 @@
 <?php
 
-//Handle AJAX
+//
+// Handle AJAX
+// If ajax requested this file; not a file this was included into
+//
 if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
+	//
+	// Require all classes used in this class
+	//
 	require_once("admin.class.php");
+	require_once("utility.php");
+	
+	//
+	// Start session
+	// Create new class instance
+	// Call method requested by ajax
+	//
 	session_start();
 	$customers = new Customers("connect.php");
 	$customers->$_POST["call"]();
 }else{
+	//
+	// Require all classes used in this class
+	//
 	require_once("php/admin.class.php");
+	require_once("php/utility.php");
 }
 
 class Customers{
 	private $db = null;
-	private $connect = null;
 	private $admin = null;
 	
 	function Customers($connect=null,$db=null){
-		$this->connect = $connect;
-		
-		//Finds database variable and assigns it to $this->db
-		if($this->db === null){
-			require($this->connect);
-			
-			//Gets mysqli database object
-			//Short circuting meqans is_a won't run if $db isn't defined
-			if(isset($db) && is_a($db,"mysqli")){
-				$this->db = $db;
-				$foundMysqliObject = true;
-			}else{
-				//Loops through every variable within scope and checks if any of them are mysqli objects
-				//If a mysqli object was saved in the connect file, it should be found
-				//Uses the first mysqli object it finds
-				//This means the name of the variable that stores the mysqli object does not matter
-				$foundMysqliObject = false;
-				foreach(get_defined_vars() as $key => $value){
-					//Checks if variable is an instance of mysqli
-					//Uses mysqli instead of mysql beacuse mysql "is deprecated as of PHP 5.5.0, and is not 
-						//recommended for writing new code as it will be removed in the future"
-					if(is_a($value,"mysqli")){
-						$this->db = $value;
-						$foundMysqliObject = true;
-						break;
-					}
-				}				
-			}
-
-			//Errors if mysqli object was not found
-			if(!$foundMysqliObject){
-				die("'" . $this->connect . "' must declare a variable that stores a mysqli object. ");
-			}
- 
-		}
-		
-		$this->admin = new Admin($this->connect,$this->db);
+		$this->db = connect($connect);
+		$this->admin = new Admin($connect,$db);
 	}
 	
 	function getTableRows($order="", $search="", $reverse=""){
@@ -62,9 +43,7 @@ class Customers{
 			$db = $this->db;
 			$output = "";
 			$direction = "";
-			
-			
-			
+					
 			if($reverse){
 				$direction = "DESC";
 			}
@@ -90,7 +69,7 @@ class Customers{
 					</tr>
 				";
 			}
-			return $this->result($output);			
+			return ret($output,__FILE__,__FUNCTION__);			
 		}
 	}
 	
@@ -99,7 +78,7 @@ class Customers{
 			require("sanitize.php");
 			$db = $this->db;
 			$result = $db->query("SELECT * FROM Customers WHERE CustomerID = '$id' LIMIT 1");
-			return $this->result($result->fetch_assoc());
+			return ret($result->fetch_assoc(),__FILE__,__FUNCTION__);
 		}
 	}
 	
@@ -130,23 +109,80 @@ class Customers{
 				,$fax
 				WHERE CustomerID = '$id'
 			");
+			
+			return ret(true,__FILE__,__FUNCTION__);
 		}
-		return $this->result(true);
 	}
-	
-	function result($returnData=""){
-		if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
-			if(is_string($returnData)){
-				echo $returnData;
-			}else{
-				if($returnData){
-					echo "true";
-				}else{
-					echo "false";
-				}				
+
+	function checkAvailability($id=""){
+		if($this->admin->isLogged()){
+			require("sanitize.php");
+			$db = $this->db;
+			$available = false;
+			
+			$result = $db->query("SELECT * FROM Customers WHERE CustomerID='$id'");
+			if($result->num_rows == 0){
+				$available = true;
 			}
+			return ret($available,__FILE__,__FUNCTION__);
 		}
-		return $returnData;
+	}
+
+	function addCustomer($id="",$companyName="",$contactName="",$contactTitle="",$address="",$city="",$region="",$postalCode="",$country="",$phone="",$fax=""){
+		if($this->admin->isLogged()){
+			$success = false;
+			if($this->checkAvailability($id)){
+				require("sanitize.php");
+				$db = $this->db;			
+					
+				$id				= "'$id'";
+				$companyName 	= $companyName 	!= "" ? "'$companyName'" 	: "NULL";
+				$contactName 	= $contactName 	!= "" ? "'$contactName'" 	: "NULL";
+				$contactTitle 	= $contactTitle != "" ? "'$contactTitle'"	: "NULL";
+				$address 		= $address 		!= "" ? "'$address'" 		: "NULL";
+				$city			= $city 		!= "" ? "'$city'" 			: "NULL";
+				$region			= $region	 	!= "" ? "'$region'" 		: "NULL";
+				$postalCode		= $postalCode 	!= "" ? "'$postalCode'" 	: "NULL";
+				$country		= $country 		!= "" ? "'$country'" 		: "NULL";
+				$phone 			= $phone 		!= "" ? "'$phone'" 			: "NULL";
+				$fax 			= $fax 			!= "" ? "'$fax'" 			: "NULL";
+				
+				$result = $db->query("INSERT INTO Customers 
+					(
+						 CustomerID
+						,CompanyName
+						,ContactName
+						,ContactTitle
+						,Address
+						,City
+						,Region
+						,PostalCode
+						,Country
+						,Phone
+						,Fax
+					)
+					VALUES (
+						 $id
+						,$companyName
+						,$contactName
+						,$contactTitle
+						,$address
+						,$city
+						,$region
+						,$postalCode
+						,$country
+						,$phone
+						,$fax
+					)
+				");
+				
+				if(!$result){
+				    die('There was an error running the query [' . $db->error . ']');
+				}
+				$success = true;
+			}
+			return ret($success,__FILE__,__FUNCTION__);
+		}	
 	}
 }
 

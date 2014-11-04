@@ -104,10 +104,11 @@
 			<div id = "edit-tools">
 				<div id = "edit-button" class = "dark-button">Edit</div>
 				<div id = "cancel-button" class = "dark-button" style = "display:none;">Cancel</div>
-				<div id = "save-button" class = "dark-button" style = "display:none;">Save</div>			
+				<div id = "save-button" class = "dark-button" style = "display:none;">Save</div>	
+				<a id = "back-button" class = "dark-button" href = "list.php">Back</a>		
 			</div>
 			
-			<a id = "back-button" class = "dark-button" href = "list.php">Back</a>
+			
 		</div>
 	</div>
 </body>

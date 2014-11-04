@@ -16,6 +16,9 @@ var NorthWind = (function(){
 			editEvent();
 			cancelEvent();
 			saveEvent();
+		}else if(page == "new"){
+			checkAvailabilityEvent();
+			addCustomerEvent();
 		}
 	}
 	
@@ -36,7 +39,7 @@ var NorthWind = (function(){
 				,name: $("#username").val()
 				,password: $("#password").val()
 			}, function(data) {	
-				data = data == "true";
+				data = data == "true" || data == "success";
 				if(data){
 					window.location = "list.php";
 				}else{
@@ -48,7 +51,7 @@ var NorthWind = (function(){
 	
 	function clearInput(){
 		$("input").val("");
-		$("input").prop("checked",false);
+		$("input[type=checkbox]").prop("checked",false);
 	}
 	
 	function displayRecordsEvent(){
@@ -128,7 +131,6 @@ var NorthWind = (function(){
 		});
 	}
 	
-
 	function saveEvent(){
 		$("#save-button").click(function(){
 			$.post("php/customers.class.php",{ 
@@ -144,7 +146,7 @@ var NorthWind = (function(){
 				,phone			: $("#phone-input").val()
 				,fax			: $("#fax-input").val()
 			}, function(data) {	
-				data = data == "true";
+				data = data == "true" || data == "success";
 				if(data){
 					MsgBox.success("Saved");
 					$(".infoContainer").each(function(){
@@ -165,7 +167,71 @@ var NorthWind = (function(){
 		})
 	}
 	
-
+	function validId(id){
+		var valid = true;
+		if(id.length > 5){
+			valid = false;
+			MsgBox.error("Invalid ID. Max length of 5 charachters",3000);
+		}else if(id == ""){
+			valid = false;
+			MsgBox.error("Please enter an ID");
+		}
+		return valid;
+	}
+	
+	function checkAvailabilityEvent(){
+		$("#check-id-unique-button").click(function(){
+			var id = $("#customer-id-input").val();
+			if(validId(id)){
+				$.post("php/customers.class.php",{ 
+					 call			: "checkAvailability"
+					,id				: $("#customer-id-input").val()
+				}, function(data) {	
+					console.log(data);
+					data = data == "true" || data == "success";
+					if(data){
+						MsgBox.success("Available");		
+					}else{
+						MsgBox.error("Unavailable");
+					}
+					
+				});				
+			}
+			
+		})
+	}
+	
+	function addCustomerEvent(){
+		$("#add-button").click(function(){
+			var id = $("#customer-id-input").val();
+			if(validId(id)){
+				$.post("php/customers.class.php",{ 
+					 call			: "addCustomer"
+					,id				: id
+					,companyName	: $("#company-name-input").val()
+					,contactName	: $("#contact-name-input").val()
+					,contactTitle	: $("#contact-title-input").val()
+					,address		: $("#address-input").val()
+					,city			: $("#city-input").val()
+					,region			: $("#region-input").val()
+					,postalCode		: $("#postal-code-input").val()
+					,country		: $("#country-input").val()
+					,phone			: $("#phone-input").val()
+					,fax			: $("#fax-input").val()
+				}, function(data) {	
+					console.log(data);
+					data = data == "true" || data == "success";
+					if(data){
+						MsgBox.success("<a href = 'customer.php?id=" + id + "'>Customer added. Click here to view</a>", false, 4000);	
+						clearInput();
+					}else{
+						MsgBox.error("ID Unavailable");
+					}
+				});					
+			}
+				
+		})
+	}
 	
 	return {
 		run:run
