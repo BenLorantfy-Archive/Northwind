@@ -20,7 +20,7 @@
 </head>
 <body data-page = "login">
 	<div id = "login-container">
-		<h1>Northwind<br/>Admin Panel</h1>
+		<h1>Northwind<br/>Admin roar</h1>
 		<input id = "username" class = "dark-textbox" type = "text"></input>
 		<input id = "password" class = "dark-textbox" type = "password"></input>
 		<input id = "login-button" class = "dark-textbox" type = "button"  value = "Login"></input>
