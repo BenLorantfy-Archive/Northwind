@@ -17,7 +17,6 @@
 if(basename(getcwd()) == "php") chdir("../");
 require_once("php/connect.php");
 require_once("php/ajax.php");
-require_once("php/sanitize.php");
 
 //
 // Handle AJAX
