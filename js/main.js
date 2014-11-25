@@ -39,13 +39,12 @@ var NorthWind = (function(){
 				,name: $("#username").val()
 				,password: $("#password").val()
 			}, function(data) {	
-				data = data == "true" || data == "success";
 				if(data){
 					window.location = "list.php";
 				}else{
 					MsgBox.error("Invalid Credentials");
 				}
-			});			
+			},"json");			
 		}			
 	}
 	
@@ -88,8 +87,8 @@ var NorthWind = (function(){
 		
 		function displayRecords(callback){
 			$.post("php/customers.class.php",{
-				 call: "getTableRows"
-				,order: order
+				 call: "generateCustomersTable"
+				,requestedOrder: order
 				,reverse: reverse
 				,search:search
 			},function(data){
@@ -100,7 +99,7 @@ var NorthWind = (function(){
 				}else{
 					orderColumn.find(".arrow").html("\u25B2");
 				}
-			})
+			},"json")
 		}
 	}
 	
@@ -146,7 +145,6 @@ var NorthWind = (function(){
 				,phone			: $("#phone-input").val()
 				,fax			: $("#fax-input").val()
 			}, function(data) {	
-				data = data == "true" || data == "success";
 				if(data){
 					MsgBox.success("Saved");
 					$(".infoContainer").each(function(){
@@ -161,9 +159,9 @@ var NorthWind = (function(){
 					$("#cancel-button").hide();
 					$("#save-button").hide();			
 				}else{
-					MsgBox.error("Invalid");
+					MsgBox.error("Failed to update");
 				}
-			});			
+			},"json");			
 		})
 	}
 	
@@ -174,31 +172,36 @@ var NorthWind = (function(){
 			MsgBox.error("Invalid ID. Max length of 5 charachters",3000);
 		}else if(id == ""){
 			valid = false;
-			MsgBox.error("Please enter an ID");
+			MsgBox.error("ID is required");
 		}
 		return valid;
 	}
 	
 	function checkAvailabilityEvent(){
-		$("#check-id-unique-button").click(function(){
-			var id = $("#customer-id-input").val();
-			if(validId(id)){
-				$.post("php/customers.class.php",{ 
-					 call			: "checkAvailability"
-					,id				: $("#customer-id-input").val()
-				}, function(data) {	
-					console.log(data);
-					data = data == "true" || data == "success";
-					if(data){
-						MsgBox.success("Available");		
-					}else{
-						MsgBox.error("Unavailable");
-					}
-					
-				});				
-			}
-			
-		})
+		var invalidInput = "";
+		$("#customer-id-input").on("focusout keyup",function(e){
+			if(e.type == "focusout" || e.keyCode == 13){
+				var id = $("#customer-id-input").val();
+				if(validId(id)){
+					$.post("php/customers.class.php",{ 
+						 call			: "checkAvailability"
+						,id				: id
+					}, function(available) {	
+						if(!available){
+							MsgBox.error("ID Unavailable",false,3000);
+							invalidInput = id;
+							$("#customer-id-input").addClass("invalid");
+							
+						}else{
+							$("#customer-id-input").removeClass("invalid");
+						}
+						
+					},"json");				
+				}else{
+					$("#customer-id-input").addClass("invalid");
+				}				
+			}			
+		});
 	}
 	
 	function addCustomerEvent(){
@@ -219,20 +222,18 @@ var NorthWind = (function(){
 					,phone			: $("#phone-input").val()
 					,fax			: $("#fax-input").val()
 				}, function(data) {	
-					console.log(data);
-					data = data == "true" || data == "success";
 					if(data){
 						MsgBox.success("<a href = 'customer.php?id=" + id + "'>Customer added. Click here to view</a>", false, 4000);	
 						clearInput();
 					}else{
 						MsgBox.error("ID Unavailable");
 					}
-				});					
+				},"json");					
 			}
 				
 		})
 	}
-	
+
 	return {
 		run:run
 	}

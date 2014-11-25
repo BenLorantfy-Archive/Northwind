@@ -1,153 +1,162 @@
 <?php
+/* 
+ * 	FILE 			: customers.class.php
+ * 	PROJECT 		: Northwind
+ * 	PROGRAMMER 		: Ben Lorantfy
+ * 	FIRST VERSION 	: 2014-12-22
+ * 	DESCRIPTION 	: Contains the admin class.  
+ */
+
+//
+// Requires
+// --------
+// Make sure working directory is root so paths point properly.
+// Since php files should be placed in either root or root/php, 
+// this checks if working directory is /php and if so moves up
+//
+if(basename(getcwd()) == "php") chdir("../");
+require_once("php/connect.php");
+require_once("php/ajax.php");
+require_once("php/sanitize.php");
+require_once("php/admin.class.php");
 
 //
 // Handle AJAX
-// If ajax requested this file; not a file this was included into
+// -----------
+// Tests if page was requested with ajax. This can be spoofed, but that doesn't really matter
+// If it was, call method specified in the post variable named "call" and echo return data
 //
-if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
-	//
-	// Require all classes used in this class
-	//
-	require_once("admin.class.php");
-	require_once("utility.php");
-	
-	//
-	// Start session
-	// Create new class instance
-	// Call method requested by ajax
-	//
-	session_start();
-	$customers = new Customers("connect.php");
-	$customers->$_POST["call"]();
-}else{
-	//
-	// Require all classes used in this class
-	//
-	require_once("php/admin.class.php");
-	require_once("php/utility.php");
+if(isset($_POST["call"]) && realpath(__FILE__) == realpath($_SERVER["SCRIPT_FILENAME"])){
+	handleAJAX("Customers");	
 }
 
+/*
+ * NAME 	: Customers
+ *
+ * PURPOSE 	: 
+ */
 class Customers{
-	private $db = null;
-	private $admin = null;
+	private $db;
+	private $admin;
 	
-	function Customers($connect=null,$db=null){
-		$this->db = connect($connect);
-		$this->admin = new Admin($connect,$db);
+	function __construct(){
+		$this->db = connect();
+		$this->admin = new Admin();
 	}
 	
-	function getTableRows($order="", $search="", $reverse=""){
+	function generateCustomersTable($requestedOrder="", $search="", $reverse=""){
 		if($this->admin->isLogged()){
-			require("sanitize.php");
-			$reverse = is_string($reverse) ? $reverse == "true" : $reverse;
-			$db = $this->db;
-			$output = "";
 			$direction = "";
-					
-			if($reverse){
+			
+			if($reverse === true || $reverse == "true"){
 				$direction = "DESC";
 			}
 			
-			$result = $db->query("SELECT * FROM Customers WHERE CompanyName LIKE '%$search%' ORDER BY $order $direction");
-			
-	
-			while($row = $result->fetch_assoc()){
-				$id = $row["CustomerID"];
-				$output .= "<tr>";
-				$output .= "<td><a href = 'customer.php?id=$id'>$id</a></td>";
-				$output .= "<td><a href = 'customer.php?id=$id'>" . $row["CompanyName"] . "</a></td>";
-				$output .= "<td><a href = 'customer.php?id=$id'>" . $row["ContactName"] . "</a></td>";
-				$output .= "<td><a href = 'customer.php?id=$id'>" . $row["City"] . "</a></td>";
-				$output .= "<td style = 'text-align:center;'><input type = 'checkbox'></input></td>";
-				$output .= "</tr>"; 
+			$order = "CompanyName";
+			if($requestedOrder == "ContactName" || $requestedOrder == "City"){
+				$order = $requestedOrder;
 			}
+
+			//
+			// Prepare query
+			// It's secure to use string concatenation here because the variables don't contain external information
+			//
+			$query = $this->db->prepare("SELECT CustomerID,CompanyName,ContactName,City FROM Customers WHERE CompanyName LIKE CONCAT('%',?,'%') ORDER BY $order $direction");
+
+			$query->bind_param("s",$search);
+			$query->execute();
+			$query->store_result();
 			
-			if($output == ""){
-				$output = "
+			$table = "";
+			if($query->num_rows > 0){
+				$query->bind_result($id,$companyName,$contactName,$city);
+				while($query->fetch()){
+					$table .= "<tr data-customer-id='$id'>";
+					$table .= "<td><a href = 'customer.php?id=$id'>$id</a></td>";
+					$table .= "<td><a href = 'customer.php?id=$id'>$companyName</a></td>";
+					$table .= "<td><a href = 'customer.php?id=$id'>$contactName</a></td>";
+					$table .= "<td><a href = 'customer.php?id=$id'>$city</a></td>";
+					$table .= "</tr>"; 					
+				}
+			}else{
+				$table = "
 					<tr id = 'noResults'>
-						<td colspan='5'>No Results</td>
+						<td colspan='4'>No Results</td>
 					</tr>
-				";
+				";				
 			}
-			return ret($output,__FILE__,__FUNCTION__);			
+			
+			return $table;		
 		}
 	}
-	
-	function getCustomer($id=""){
+
+	function customerData($id=""){
 		if($this->admin->isLogged()){
-			require("sanitize.php");
-			$db = $this->db;
-			$result = $db->query("SELECT * FROM Customers WHERE CustomerID = '$id' LIMIT 1");
-			return ret($result->fetch_assoc(),__FILE__,__FUNCTION__);
+			$result = $this->db->query("SELECT * FROM Customers WHERE CustomerID = '$id' LIMIT 1");
+			return $result->fetch_assoc();
 		}
 	}
-	
+
 	function updateCustomer($id="",$contactName="",$contactTitle="",$address="",$city="",$region="",$postalCode="",$country="",$phone="",$fax=""){
-		if($this->admin->isLogged()){
-			require("sanitize.php");
-			$db = $this->db;
+		if($this->admin->isLogged()){	
+			//
+			// Sets all empty strings to null
+			//
+			foreach(func_get_args() as $key => $value){
+				$$key = empty($value) ? NULL : $value;
+			}
 			
-			$contactNameUpdate 	= $contactName 	!= "" ? "ContactName = '$contactName'" 	: "ContactName = NULL";
-			$contactTitleUpdate = $contactTitle != "" ? "ContactTitle = '$contactTitle'": "ContactTitle = NULL";
-			$addressUpdate 		= $address 		!= "" ? "Address = '$address'" 			: "Address = NULL";
-			$cityUpdate			= $city 		!= "" ? "City = '$city'" 				: "City = NULL";
-			$regionUpdate		= $region	 	!= "" ? "Region = '$region'" 			: "Region = NULL";
-			$postalCodeUpdate	= $postalCode 	!= "" ? "PostalCode = '$postalCode'" 	: "PostalCode = NULL";
-			$countryUpdate		= $country 		!= "" ? "Country = '$country'" 			: "Country = NULL";
-			$phoneUpdate 		= $phone 		!= "" ? "Phone = '$phone'" 				: "Phone = NULL";
-			$fax 				= $fax 			!= "" ? "Fax = '$fax'" 					: "Fax = NULL";
-			
-			$result = $db->query("UPDATE Customers SET 
-				 $contactNameUpdate
-				,$contactTitleUpdate
-				,$addressUpdate
-				,$cityUpdate
-				,$regionUpdate
-				,$postalCodeUpdate
-				,$countryUpdate
-				,$phoneUpdate
-				,$fax
-				WHERE CustomerID = '$id'
+			//
+			// Prepares statement
+			//
+			$query = $this->db->prepare("UPDATE Customers SET
+				 ContactName = ?
+				,ContactTitle = ?
+				,Address = ?
+				,City = ?
+				,Region = ?
+				,PostalCode = ?
+				,Country = ?
+				,Phone = ?
+				,Fax = ?
+				WHERE CustomerID = ?		
 			");
 			
-			return ret(true,__FILE__,__FUNCTION__);
+			$query->bind_param("ssssssssss",$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax,$id);
+			$query->execute();
+			
+			return true;
 		}
 	}
 
 	function checkAvailability($id=""){
 		if($this->admin->isLogged()){
-			require("sanitize.php");
-			$db = $this->db;
 			$available = false;
 			
-			$result = $db->query("SELECT * FROM Customers WHERE CustomerID='$id'");
-			if($result->num_rows == 0){
+			$query = $this->db->prepare("SELECT CustomerID FROM Customers WHERE CustomerID = ?");
+			$query->bind_param("s",$id);
+			$query->execute();
+			$query->store_result();
+			if($query->num_rows == 0){
 				$available = true;
 			}
-			return ret($available,__FILE__,__FUNCTION__);
+			
+			return $available;
 		}
 	}
 
 	function addCustomer($id="",$companyName="",$contactName="",$contactTitle="",$address="",$city="",$region="",$postalCode="",$country="",$phone="",$fax=""){
 		if($this->admin->isLogged()){
 			$success = false;
-			if($this->checkAvailability($id)){
-				require("sanitize.php");
-				$db = $this->db;			
-					
-				$id				= "'$id'";
-				$companyName 	= $companyName 	!= "" ? "'$companyName'" 	: "NULL";
-				$contactName 	= $contactName 	!= "" ? "'$contactName'" 	: "NULL";
-				$contactTitle 	= $contactTitle != "" ? "'$contactTitle'"	: "NULL";
-				$address 		= $address 		!= "" ? "'$address'" 		: "NULL";
-				$city			= $city 		!= "" ? "'$city'" 			: "NULL";
-				$region			= $region	 	!= "" ? "'$region'" 		: "NULL";
-				$postalCode		= $postalCode 	!= "" ? "'$postalCode'" 	: "NULL";
-				$country		= $country 		!= "" ? "'$country'" 		: "NULL";
-				$phone 			= $phone 		!= "" ? "'$phone'" 			: "NULL";
-				$fax 			= $fax 			!= "" ? "'$fax'" 			: "NULL";
-				
-				$result = $db->query("INSERT INTO Customers 
+			if($this->checkAvailability($id)){					
+				//
+				// Sets all empty strings to null
+				//
+				foreach(func_get_args() as $key => $value){
+					$$key = empty($value) ? NULL : $value;
+				}
+			
+				$query = $this->db->prepare("INSERT INTO Customers 
 					(
 						 CustomerID
 						,CompanyName
@@ -161,31 +170,17 @@ class Customers{
 						,Phone
 						,Fax
 					)
-					VALUES (
-						 $id
-						,$companyName
-						,$contactName
-						,$contactTitle
-						,$address
-						,$city
-						,$region
-						,$postalCode
-						,$country
-						,$phone
-						,$fax
-					)
+					VALUES (?,?,?,?,?,?,?,?,?,?,?)
 				");
 				
-				if(!$result){
-				    die('There was an error running the query [' . $db->error . ']');
-				}
+				$query->bind_param("sssssssssss",$id,$companyName,$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax);
+				$query->execute();
 				$success = true;
 			}
-			return ret($success,__FILE__,__FUNCTION__);
+			return $success;
 		}	
 	}
+
 }
-
-
 
 ?>
