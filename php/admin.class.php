@@ -1,119 +1,98 @@
 <?php
+/* 
+ * 	FILE 			: admin.class.php
+ * 	PROJECT 		: Northwind
+ * 	PROGRAMMER 		: Ben Lorantfy
+ * 	FIRST VERSION 	: 2014-12-22
+ * 	DESCRIPTION 	: Contains the admin class.  
+ */
+
+//
+// Requires
+// --------
+// Make sure working directory is root so paths point properly.
+// Since php files should be placed in either root or root/php, 
+// this checks if working directory is /php and if so moves up
+//
+if(basename(getcwd()) == "php") chdir("../");
+require_once("php/connect.php");
+require_once("php/ajax.php");
+require_once("php/sanitize.php");
+
+//
+// Handle AJAX
+// -----------
+// Tests if page was requested with ajax. This can be spoofed, but that doesn't really matter
+// If it was, call method specified in the post variable named "call" and echo return data
+//
+if(isset($_POST["call"]) && realpath(__FILE__) == realpath($_SERVER["SCRIPT_FILENAME"])){
+	echo "hi";
+	//handleAJAX("Admin");	
+}
+
+/*
+ * NAME 	: Admin
+ *
+ * PURPOSE 	: The admin class contains several functions used
+ *			  to log in/authenticate
+ */
 class Admin{
-	private $db = null;
-	private $connect = null;
+	private $db;
 	
-	function Admin($connect=null,$db=null){
-		$this->connect = $connect;
-		
-		//Finds database variable and assigns it to $this->db
-		if($this->db === null){
-			require($this->connect);
-			
-			//Gets mysqli database object
-			//Short circuting meqans is_a won't run if $db isn't defined
-			if(isset($db) && is_a($db,"mysqli")){
-				$this->db = $db;
-				$foundMysqliObject = true;
-			}else{
-				//Loops through every variable within scope and checks if any of them are mysqli objects
-				//If a mysqli object was saved in the connect file, it should be found
-				//Uses the first mysqli object it finds
-				//This means the name of the variable that stores the mysqli object does not matter
-				$foundMysqliObject = false;
-				foreach(get_defined_vars() as $key => $value){
-					//Checks if variable is an instance of mysqli
-					//Uses mysqli instead of mysql beacuse mysql "is deprecated as of PHP 5.5.0, and is not 
-						//recommended for writing new code as it will be removed in the future"
-					if(is_a($value,"mysqli")){
-						$this->db = $value;
-						$foundMysqliObject = true;
-						break;
-					}
-				}				
-			}
-
-			//Errors if mysqli object was not found
-			if(!$foundMysqliObject){
-				die("'" . $this->connect . "' must declare a variable that stores a mysqli object. ");
-			}
- 
-
-		}
+	function __construct(){
+		$this->db = connect();
 	}
 	
-	function create($name="",$password=""){
-		require("sanitize.php");
-		if($this->isLogged()){
-			$db = $this->db;
-			$password = password_hash($password, PASSWORD_DEFAULT);
-			$db->query("INSERT INTO users (name,password) VALUES ('$name','$password')");
-			$this->login($name,$password);
-		}		
-	}
-
 	function login($name="",$password=""){
-		require("sanitize.php");
-		$isLogged = false;
-		$db = $this->db;
-		$result = $db->query("SELECT * FROM users WHERE name = '$name' LIMIT 1");
-		if($result->num_rows > 0){
-			$row = $result->fetch_assoc();
-			if(password_verify($password,$row["password"])){
+		$success = false;
+		
+		//
+		// Using prepared statements is slightly slower in this case, but more secure
+		//
+		$query = $this->db->prepare("SELECT password FROM users WHERE name = ? LIMIT 1");
+		$query->bind_param("s",$name);
+		$query->execute();
+		$query->store_result();
+		
+		if($query->num_rows == 1){
+			$query->bind_result($hashedPassword);
+			$query->fetch();
+			if(password_verify($password,$hashedPassword)){
 				$_SESSION["name"] = $name;
-				$_SESSION["password"] = $password;		
-				$isLogged = true;		
+				$_SESSION["password"] = $password;
+				$success = true;
 			}
 		}
-		return $this->result($isLogged);
+				
+		return $success;
+	}
+	
+	function isLogged(){
+		$logged = false;		
+		if(isset($_SESSION["name"]) && isset($_SESSION["password"])){			
+			//
+			// Using prepared statements is slightly slower in this case, but more secure
+			//
+			$query = $this->db->prepare("SELECT password FROM users WHERE name = ? LIMIT 1");
+			$query->bind_param("s",$_SESSION["name"]);
+			$query->execute();
+			$query->store_result();
+			
+			if($query->num_rows == 1){
+				$query->bind_result($hashedPassword);
+				$query->fetch();
+				if(password_verify($_SESSION["password"],$hashedPassword)){
+					$logged = true;
+				}
+			}
+		}
+		
+		return $logged;
 	}
 	
 	function logout(){
 		session_destroy();
 	}
-	
-	function isLogged(){
-		$isLogged = false;
-		
-		if(isset($_SESSION["name"]) && isset($_SESSION["password"])){
-			$db = $this->db;			
-			$name = $db->escape_string($_SESSION["name"]);
-			$password = $db->escape_string($_SESSION["password"]);
-			
-			$result = $db->query("SELECT * FROM users WHERE name = '$name' LIMIT 1");
-			$row = $result->fetch_assoc();
-			if($result->num_rows > 0){
-				if(password_verify($password,$row["password"])){
-					$isLogged = true;
-				}
-			}
-		}
-		
-		return $this->result($isLogged);
-	}
-	
-	function result($returnData=""){
-		if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
-			if(is_string($returnData)){
-				echo $returnData;
-			}else{
-				if($returnData){
-					echo "true";
-				}else{
-					echo "false";
-				}				
-			}
-		}
-		return $returnData;
-	}
 }
-
-//Handle AJAX
-if(isset($_POST["call"]) && __FILE__ == $_SERVER["SCRIPT_FILENAME"]){
-	session_start();
-	$admin = new Admin("connect.php");
-	$admin->$_POST["call"]();
-}
-
 
 ?>

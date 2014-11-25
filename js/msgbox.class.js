@@ -16,6 +16,9 @@ MsgBox = (function(){
 		$("body").append(msgBox);
 	});
 	
+	var out = false;
+	var timeout = setTimeout(function(){},0);
+	
 	function animate(stay,duration){
 		if(typeof stay === "undefined"){
 			var stay = false;
@@ -27,34 +30,55 @@ MsgBox = (function(){
 		if(typeof duration === "undefined"){
 			var duration = 1300;
 		}
-
+		
+		out = true;
 		msgBox.stop();
 		msgBox.css("top",-1*(msgBox.height() + 10));
 		msgBox.animate({ top: 0 }, 600, "easeOutQuart",function(){
 			if(!stay){
-				msgBox.delay(duration).animate({ top: -1*(msgBox.height() + 10) }, 600, "easeOutQuart");
+				timeout = setTimeout(function(){
+					if(out){
+						msgBox.animate({ top: -1*(msgBox.height() + 10) }, 600, "easeOutQuart",function(){
+							out = false;
+						});						
+					}
+				}, duration)
 			}	
-		});		
+		});	
 	}
 	
 	//Public:
 	function error(msg,stay,duration){
-		msgBox.html(msg);
-		msgBox.attr("style",style + redGradient);
-		
-		// Center message box
-		msgBox.css("margin-left","-" + msgBox.width()/2 + "px");
-		animate(stay,duration);
+		show(msg,stay,duration,redGradient);
 	}
 
 	function success(msg,stay,duration){
-		msgBox.html(msg);
-		msgBox.attr("style",style + greenGradient);
-		
-		// Center message box
-		msgBox.css("margin-left","-" + msgBox.width()/2 + "px");
-		animate(stay,duration);
+		show(msg,stay,duration,greenGradient);
 	}	
+	
+	function show(msg,stay,duration,gradient){	
+		clearTimeout(timeout);			
+		msgBox.stop();
+		
+		if(out){			
+			msgBox.animate({ top: -1*(msgBox.height() + 10) }, 300, "easeOutQuart",function(){
+				out = false;
+				msgBox.html(msg);
+				msgBox.attr("style",style + gradient);
+				
+				// Center message box
+				msgBox.css("margin-left","-" + msgBox.width()/2 + "px");
+				animate(stay,duration);		
+			});
+		}else{
+			msgBox.html(msg);
+			msgBox.attr("style",style + gradient);
+			
+			// Center message box
+			msgBox.css("margin-left","-" + msgBox.width()/2 + "px");
+			animate(stay,duration);			
+		}		
+	}
 	
 	function close(){
 		msgBox.animate({ top: -1*(msgBox.height() + 10)}, 600, "easeOutQuart");

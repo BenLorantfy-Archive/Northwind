@@ -1,7 +1,7 @@
 <?php
 	session_start();
 	include("php/admin.class.php");
-	$admin = new Admin("php/connect.php");
+	$admin = new Admin();
 	if($admin->isLogged()){
 		if(isset($_GET["logout"])){
 			$admin->logout();
@@ -16,7 +16,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<?php include("head.php"); ?>
+	<?php include("php/head.php"); ?>
 </head>
 <body data-page = "login">
 	<div id = "login-container">

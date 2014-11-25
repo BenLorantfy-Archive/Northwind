@@ -243,7 +243,7 @@ h4{
 	padding-top: 20px;
 }
 
-#search, #new, #delete{
+#search, #new{
 	display: inline-block;
 }
 
@@ -253,25 +253,18 @@ h4{
 
 #new{
 	margin-left: 1%;
-	border-top-right-radius: 0;
-	border-bottom-right-radius: 0;
-}
-
-#delete{
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;	
-	border-left: none;
-}
-
-#new, #delete{
 	text-align: center;
 	font-size:18px;
-	min-width: 5%;
+	min-width: 10%;
 }
 
 #tools{
 	margin-bottom: 20px;
 	margin-top:20px;
+}
+
+.checkbox-container{
+	text-align: center;
 }
 
 /* ======================================
@@ -293,6 +286,10 @@ h4{
 	font-size: 14px;
 	padding: 5px;
 	vertical-align: middle;
+}
+
+.invalid{
+	border-color: #a90329;
 }
 
 /*

@@ -11,11 +11,11 @@
 <!DOCTYPE>
 <html>
 <head>
-	<?php include("head.php"); ?>
+	<?php include("php/head.php"); ?>
 </head>
 <body data-page = "new">
 	<div id = "site-container">
-		<?php include("nav.php"); ?>
+		<?php include("php/nav.php"); ?>
 		<div id = "content-container">
 			<h3>Add New Customer</h3>
 			<div class = "infoContainer">
@@ -27,10 +27,6 @@
 			<div class = "infoContainer">
 				<label class = "infoLabel">Customer Id:</label> 
 				<input id = "customer-id-input" class = "infoTextbox dark-textbox" type = "text"/>
-				<span class = "createInfoHeight"></span>
-				<div class = "clear"></div>
-				<label class = "infoLabel"></label> 
-				<div id = "check-id-unique-button" class = "dark-button" href = "list.php">Check Availability</div>
 				<span class = "createInfoHeight"></span>
 			</div>
 
