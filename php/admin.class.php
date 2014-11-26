@@ -25,8 +25,7 @@ require_once("php/ajax.php");
 // If it was, call method specified in the post variable named "call" and echo return data
 //
 if(isset($_POST["call"]) && realpath(__FILE__) == realpath($_SERVER["SCRIPT_FILENAME"])){
-	echo "hi";
-	//handleAJAX("Admin");	
+	handleAJAX("Admin");	
 }
 
 /*
