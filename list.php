@@ -1,8 +1,9 @@
 <?php
 	session_start();
-	include("php/admin.class.php");
+	require_once("php/admin.class.php");
+	require_once("php/customers.class.php");
+	
 	$admin = new Admin();
-
 	if(!$admin->isLogged()){
 		header("Location: ./");
 		die();
@@ -33,8 +34,7 @@
 				</thead>
 				<tbody id = "records">
 					<?php
-						include("php/customers.class.php");
-						$customers = new Customers("php/connect.php");
+						$customers = new Customers();
 						echo $customers->generateCustomersTable("CompanyName","",false);
 					?>
 				</tbody>

@@ -1,7 +1,8 @@
 <?php
 	session_start();
-	include("php/admin.class.php");
-	$admin = new Admin("php/connect.php");
+	require_once("php/admin.class.php");
+	
+	$admin = new Admin();
 	if(!$admin->isLogged()){
 		header('Location: ../');
 		die();
