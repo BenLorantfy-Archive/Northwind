@@ -1,9 +1,9 @@
 <?php
 	session_start();
-	include("php/admin.class.php");
-	include("php/customers.class.php");
+	require_once("php/admin.class.php");
+	require_once("php/customers.class.php");
 	
-	$admin = new Admin("php/connect.php");
+	$admin = new Admin();
 	if(!$admin->isLogged()){
 		header('Location: ./');
 		die();
