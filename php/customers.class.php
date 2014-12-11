@@ -22,17 +22,21 @@ require_once("php/admin.class.php");
 //
 // Handle AJAX
 // -----------
-// Tests if page was requested with ajax. This can be spoofed, but that doesn't really matter
-// If it was, call method specified in the post variable named "call" and echo return data
+// Tests if page was requested with ajax. This can be spoofed, but that doesn't really matter because
+// ajax calls are treated the same as regular calls, and user inputs aren't trusted at any point
+// If it was ajax, call method specified in the post variable named "call" and echo return data
+// See ajax.php for more info
 //
 if(isset($_POST["call"]) && realpath(__FILE__) == realpath($_SERVER["SCRIPT_FILENAME"])){
 	handleAJAX("Customers");	
 }
 
 /*
+ *
  * NAME 	: Customers
  *
- * PURPOSE 	: 
+ * PURPOSE 	: Contains methods used to interact with customers. (i.e. remove, edit, add, display)
+ *
  */
 class Customers{
 	private $db;
@@ -44,140 +48,277 @@ class Customers{
 	}
 	
 	function generateCustomersTable($requestedOrder="", $search="", $reverse=""){
-		if($this->admin->isLogged()){
-			$direction = "";
-			
-			if($reverse === true || $reverse == "true"){
-				$direction = "DESC";
-			}
-			
-			$order = "CompanyName";
-			if($requestedOrder == "ContactName" || $requestedOrder == "City"){
-				$order = $requestedOrder;
-			}
+		//
+		// Don't run function if db failed to connect or admin is not logged
+		// This makes the function easier to read and avoids excessive if statements
+		// Called a gaurd statement in Fowler's refactoring
+		//
+		// According to code complete:
+		// "Use a return when it enhances readability. In certain routines, once you know the answer, you want to return it to the calling
+		// routine immediately. If the routine is defined in such a way that it doesn't require any cleanup, not returning immediately means 
+		// that you have to write more code."
+		//
+		if($db->connect_errno > 0) return false;
+		if(!$this->admin->isLogged()) return false;
 
-			//
-			// Prepare query
-			// It's secure to use string concatenation here because the variables don't contain external information
-			//
-			$query = $this->db->prepare("SELECT CustomerID,CompanyName,ContactName,City FROM Customers WHERE CompanyName LIKE CONCAT('%',?,'%') ORDER BY $order $direction");
+		$success = false;
 
-			$query->bind_param("s",$search);
-			$query->execute();
-			$query->store_result();
-			
-			$table = "";
-			if($query->num_rows > 0){
-				$query->bind_result($id,$companyName,$contactName,$city);
-				while($query->fetch()){
-					$table .= "<tr data-customer-id='$id'>";
-					$table .= "<td><a href = 'customer.php?id=$id'>$id</a></td>";
-					$table .= "<td><a href = 'customer.php?id=$id'>$companyName</a></td>";
-					$table .= "<td><a href = 'customer.php?id=$id'>$contactName</a></td>";
-					$table .= "<td><a href = 'customer.php?id=$id'>$city</a></td>";
-					$table .= "</tr>"; 					
+		$direction = "";		
+		if($reverse === true || $reverse == "true"){
+			$direction = "DESC";
+		}
+		
+		$order = "CompanyName";
+		if($requestedOrder == "ContactName" || $requestedOrder == "City"){
+			$order = $requestedOrder;
+		}
+
+		//
+		// Prepare query
+		// It's safe to use string concatenation here because the concatenated variables don't contain external information and
+		// are not used as value
+		//
+		$query = $this->db->prepare("SELECT CustomerID,CompanyName,ContactName,City FROM Customers WHERE CompanyName LIKE CONCAT('%',?,'%') ORDER BY $order $direction");
+
+		if($query !== false){
+			if($query->bind_param("s",$search)){
+				if($query->execute()){
+					if($query->store_result()){
+						$table = "";
+						if($query->num_rows > 0){
+							if($query->bind_result($id,$companyName,$contactName,$city)){
+								$success = true;
+								while($query->fetch()){
+									$table .= "<tr data-customer-id='$id'>";
+									$table .= "<td><a href = 'customer.php?id=$id'>$id</a></td>";
+									$table .= "<td><a href = 'customer.php?id=$id'>$companyName</a></td>";
+									$table .= "<td><a href = 'customer.php?id=$id'>$contactName</a></td>";
+									$table .= "<td><a href = 'customer.php?id=$id'>$city</a></td>";
+									$table .= "</tr>"; 					
+								}								
+							}
+						}else{
+							$success = true;
+							$table = "
+								<tr id = 'noResults'>
+									<td colspan='4'>No Results</td>
+								</tr>
+							";				
+						}						
+					}
 				}
-			}else{
-				$table = "
-					<tr id = 'noResults'>
-						<td colspan='4'>No Results</td>
-					</tr>
-				";				
 			}
-			
-			return $table;		
+		}
+
+		if($success){
+			return $table;
+		}else{
+			return $success;
 		}
 	}
 
 	function customerData($id=""){
-		if($this->admin->isLogged()){
-			$result = $this->db->query("SELECT * FROM Customers WHERE CustomerID = '$id' LIMIT 1");
-			return $result->fetch_assoc();
-		}
+	
+		//
+		// Don't continue if db failed to connect or admin is not logged
+		//
+		if($db->connect_errno > 0) return false;
+		if(!$this->admin->isLogged()) return false;
+		$success = false;
+		
+		$query = $this->db->prepare("
+			SELECT 
+				   CompanyName
+			 	  ,ContactName
+			 	  ,ContactTitle
+			 	  ,Address
+			 	  ,City
+			 	  ,Region
+			 	  ,PostalCode
+			 	  ,Country
+			 	  ,Phone
+			 	  ,Fax
+			 FROM Customers WHERE CustomerID = ? LIMIT 1
+		");
+			
+		if($query !== false){
+			if($query->bind_param("s",$id)){
+				if($query->execute()){
+					if($query->store_result()){
+						if($query->bind_result($companyName,$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax)){
+							$success = $query->fetch();
+						}
+					}
+				}
+			}
+		}			
+		$success = $query->num_rows > 0;
+		
+		if($success){			
+			return array(
+				 "CustomerID" => $id
+				,"CompanyName" => $companyName
+				,"ContactName" => $contactName
+				,"ContactTitle" => $contactTitle
+				,"Address" => $address
+				,"City" => $city
+				,"Region" => $region
+				,"PostalCode" => $postalCode
+				,"Country" => $country
+				,"Phone" => $phone
+				,"Fax" => $fax
+			);					
+		}else{
+			return false;
+		}	
 	}
 
-	function updateCustomer($id="",$contactName="",$contactTitle="",$address="",$city="",$region="",$postalCode="",$country="",$phone="",$fax=""){
-		if($this->admin->isLogged()){	
+	function updateCustomer(
+		 $id=""
+	    ,$companyName=""
+	    ,$contactName=""
+	    ,$contactTitle=""
+	    ,$address=""
+	    ,$city=""
+	    ,$region=""
+	    ,$postalCode=""
+	    ,$country=""
+	    ,$phone=""
+	    ,$fax=""
+	){
+		//
+		// Don't continue if db failed to connect or admin is not logged
+		//
+		if($db->connect_errno > 0) return false;
+		if(!$this->admin->isLogged()) return false;
+		
+		$success = false;
+		
+		//
+		// Sets all empty strings to null
+		//
+		foreach(func_get_args() as $key => $value){
+			$$key = empty($value) ? NULL : $value;
+		}
+		
+		//
+		// Prepares update
+		//
+		$query = $this->db->prepare("UPDATE Customers SET
+			 CompanyName = ?
+			,ContactName = ?
+			,ContactTitle = ?
+			,Address = ?
+			,City = ?
+			,Region = ?
+			,PostalCode = ?
+			,Country = ?
+			,Phone = ?
+			,Fax = ?
+			WHERE CustomerID = ?		
+		");
+			
+		if($query !== false){
+			if($query->bind_param("sssssssssss",$companyName,$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax,$id)){				
+				$success = $query->execute();
+			}				
+		}
+						
+		return $success;	
+	}
+
+	function checkAvailability($id=""){
+		//
+		// Don't continue if db failed to connect or admin is not logged
+		//
+		if($db->connect_errno > 0) return false;
+		if(!$this->admin->isLogged()) return false;
+		
+		//
+		// Select all records with id = $id
+		//
+		$available = false;	
+		$query = $this->db->prepare("SELECT CustomerID FROM Customers WHERE CustomerID = ?");
+		if($query !== false){
+			if($query->bind_param("s",$id)){
+				if($query->execute()){
+					if($query->store_result()){
+						//
+						// If no records were found, set $available to true, otherwise, remain false
+						//
+						if($query->num_rows == 0){
+							$available = true;
+						}						
+					}
+										
+				}
+			
+			}
+			
+		}
+
+		
+		return $available;
+		
+	}
+
+	function addCustomer(
+		 $id=""
+		,$companyName=""
+		,$contactName=""
+		,$contactTitle=""
+		,$address=""
+		,$city=""
+		,$region=""
+		,$postalCode=""
+		,$country=""
+		,$phone=""
+		,$fax=""
+	){
+		//
+		// Don't continue if db failed to connect or admin is not logged
+		//
+		if($db->connect_errno > 0) return false;
+		if(!$this->admin->isLogged()) return false;
+
+		//
+		// If desired id is available, add customer
+		//
+		$success = false;
+		if($this->checkAvailability($id)){					
 			//
 			// Sets all empty strings to null
 			//
 			foreach(func_get_args() as $key => $value){
 				$$key = empty($value) ? NULL : $value;
 			}
-			
-			//
-			// Prepares statement
-			//
-			$query = $this->db->prepare("UPDATE Customers SET
-				 ContactName = ?
-				,ContactTitle = ?
-				,Address = ?
-				,City = ?
-				,Region = ?
-				,PostalCode = ?
-				,Country = ?
-				,Phone = ?
-				,Fax = ?
-				WHERE CustomerID = ?		
+		
+			$query = $this->db->prepare("INSERT INTO Customers 
+				(
+					 CustomerID
+					,CompanyName
+					,ContactName
+					,ContactTitle
+					,Address
+					,City
+					,Region
+					,PostalCode
+					,Country
+					,Phone
+					,Fax
+				)
+				VALUES (?,?,?,?,?,?,?,?,?,?,?)
 			");
 			
-			$query->bind_param("ssssssssss",$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax,$id);
-			$query->execute();
-			
-			return true;
-		}
-	}
-
-	function checkAvailability($id=""){
-		if($this->admin->isLogged()){
-			$available = false;
-			
-			$query = $this->db->prepare("SELECT CustomerID FROM Customers WHERE CustomerID = ?");
-			$query->bind_param("s",$id);
-			$query->execute();
-			$query->store_result();
-			if($query->num_rows == 0){
-				$available = true;
-			}
-			
-			return $available;
-		}
-	}
-
-	function addCustomer($id="",$companyName="",$contactName="",$contactTitle="",$address="",$city="",$region="",$postalCode="",$country="",$phone="",$fax=""){
-		if($this->admin->isLogged()){
-			$success = false;
-			if($this->checkAvailability($id)){					
-				//
-				// Sets all empty strings to null
-				//
-				foreach(func_get_args() as $key => $value){
-					$$key = empty($value) ? NULL : $value;
+			if($query !== false){
+				if($query->bind_param("sssssssssss",$id,$companyName,$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax)){
+					$success = $query->execute();					
 				}
-			
-				$query = $this->db->prepare("INSERT INTO Customers 
-					(
-						 CustomerID
-						,CompanyName
-						,ContactName
-						,ContactTitle
-						,Address
-						,City
-						,Region
-						,PostalCode
-						,Country
-						,Phone
-						,Fax
-					)
-					VALUES (?,?,?,?,?,?,?,?,?,?,?)
-				");
-				
-				$query->bind_param("sssssssssss",$id,$companyName,$contactName,$contactTitle,$address,$city,$region,$postalCode,$country,$phone,$fax);
-				$query->execute();
-				$success = true;
-			}
-			return $success;
-		}	
+			}			
+
+		}
+		return $success;
+		
 	}
 
 }

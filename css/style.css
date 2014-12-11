@@ -78,10 +78,6 @@ h4{
 	border: 1px solid rgba(0,0,0,0.3);
 }
 
-#title-container{
-	height: 15%;
-}
-
 #content-container{
 	margin-bottom: 20px;
 }
@@ -179,7 +175,7 @@ h4{
 }
 
 /* ======================================
- *               admin.php
+ *               list.php
  * ====================================== */
 #recordTable{
 	table-layout: fixed;
@@ -272,6 +268,13 @@ h4{
 /* ======================================
  *            customer.php
  * ====================================== */
+#company-name-big-input{
+	font-size: 26px;
+	width:50%;
+	min-width:300px;
+	margin-bottom: 10px;
+}
+
 .infoContainer{
 	color: white;
 	vertical-align: middle;

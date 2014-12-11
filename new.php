@@ -12,6 +12,7 @@
 <!DOCTYPE>
 <html>
 <head>
+	<title>New Customer</title>
 	<?php include("php/head.php"); ?>
 </head>
 <body data-page = "new">
