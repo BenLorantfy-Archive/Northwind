@@ -42,6 +42,8 @@ class Admin{
 	}
 	
 	function login($name="",$password=""){
+		if($db->connect_errno > 0) return false;
+		
 		$success = false;
 		
 		//
@@ -66,6 +68,8 @@ class Admin{
 	}
 	
 	function isLogged(){
+		if($db->connect_errno > 0) return false;
+		
 		$logged = false;		
 		if(isset($_SESSION["name"]) && isset($_SESSION["password"])){			
 			//

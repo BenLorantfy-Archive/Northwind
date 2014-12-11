@@ -61,7 +61,7 @@ function handleAJAX($class){
 		// Echos $returnData in json format
 		// In an AJAX request, this can be accessed client-side as response data
 		//
-		// Second parameter is a bitmask that sensures html is treated correctly when decoded
+		// Second parameter is a bitmask that ensures html is treated correctly when decoded
 		// JSON_HEX_TAG: All < and > are converted to \u003C and \u003E. Available since PHP 5.3.0.
 		// JSON_HEX_QUOT: All " are converted to \u0022. Available since PHP 5.3.0
 		//

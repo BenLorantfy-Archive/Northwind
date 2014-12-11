@@ -179,7 +179,7 @@ h4{
 }
 
 /* ======================================
- *               admin.php
+ *               list.php
  * ====================================== */
 #recordTable{
 	table-layout: fixed;
@@ -272,6 +272,13 @@ h4{
 /* ======================================
  *            customer.php
  * ====================================== */
+#company-name-input{
+	font-size: 26px;
+	width:50%;
+	min-width:300px;
+	margin-bottom: 10px;
+}
+
 .infoContainer{
 	color: white;
 	vertical-align: middle;

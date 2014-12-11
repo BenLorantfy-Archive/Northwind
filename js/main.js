@@ -8,24 +8,32 @@ var NorthWind = (function(){
 		//
 		var page = $("body").data("page");
 		if(page == "login"){
-			loginEvent();	
+			loggingIn();	
 		}else if(page == "list"){
-			displayRecordsEvent();
-			clearInput();
+			if(typeof $("body").data("error") == "undefined"){
+				displayingRecords();
+				clearInput();			
+			}else{
+				MsgBox.error("Failed to display customers.");
+			}
 		}else if(page == "customer"){
-			editEvent();
-			cancelEvent();
-			saveEvent();
+			if(typeof $("body").data("error") == "undefined"){
+				editing();
+				canceling();
+				saving();				
+			}else{
+				MsgBox.error("Failed to get customer data.");
+			}
 		}else if(page == "new"){
-			checkAvailabilityEvent();
-			addCustomerEvent();
+			checkingAvailability();
+			adding();
 		}
 	}
 	
 	/* ---------------
 	 *    Private
 	 * --------------- */			
-	function loginEvent(){
+	function loggingIn(){
 		$("#login-button").click(login);
 		$(document).keydown(function(e){
 			if(e.keyCode == 13){
@@ -50,10 +58,9 @@ var NorthWind = (function(){
 	
 	function clearInput(){
 		$("input").val("");
-		$("input[type=checkbox]").prop("checked",false);
 	}
 	
-	function displayRecordsEvent(){
+	function displayingRecords(){
 		var order = "CompanyName";
 		var search = "";
 		var reverse = false;
@@ -92,49 +99,58 @@ var NorthWind = (function(){
 				,reverse: reverse
 				,search:search
 			},function(data){
-				$("#records").html(data);
-				$("#recordTable").find("thead").find(".arrow").html("");
-				if(reverse){
-					orderColumn.find(".arrow").html("\u25BC");
+				if(data){
+					$("#records").html(data);
+					$("#recordTable").find("thead").find(".arrow").html("");
+					if(reverse){
+						orderColumn.find(".arrow").html("\u25BC");
+					}else{
+						orderColumn.find(".arrow").html("\u25B2");
+					}					
 				}else{
-					orderColumn.find(".arrow").html("\u25B2");
+					MsgBox.error("Failed to display records");
 				}
 			},"json")
 		}
 	}
 	
-	function editEvent(){
+	function editing(){
 		$("#edit-button").click(function(){
-			$(".infoContainer").each(function(){
-				$(this).find(".info").hide();
-				$(this).find(".infoTextbox").show();
-			})	
+			$(".info").hide();
+			$(".infoTextbox").show();
 			$("#edit-button").hide();
 			$("#cancel-button").show();
 			$("#save-button").show();
 		})
 	}
 
-	function cancelEvent(){
+	function canceling(){
 		$("#cancel-button").click(function(){
-			$(".infoContainer").each(function(){
-				var info = $(this).find(".info");
-				var infoTextbox = $(this).find(".infoTextbox");
+			$(".info").each(function(){
+				var info = $(this);
+				if(info.attr("id") == "company-name"){
+					var infoTextbox = info.next();
+				}else{
+					var infoTextbox = $(this).parent().find(".infoTextbox");				
+				}
+				
 				var newInfoTextboxVal = info.html() == "unspecified" ? "" : info.html();
 				info.show();
 				infoTextbox.val(newInfoTextboxVal).hide();			
-			})		
+			});
+			
 			$("#edit-button").show();
 			$("#cancel-button").hide();
 			$("#save-button").hide();
 		});
 	}
 	
-	function saveEvent(){
+	function saving(){
 		$("#save-button").click(function(){
 			$.post("php/customers.class.php",{ 
 				 call			: "updateCustomer"
 				,id				: $("#customer-id").html()
+				,companyName	: $("#company-name-input").val()
 				,contactName	: $("#contact-name-input").val()
 				,contactTitle	: $("#contact-title-input").val()
 				,address		: $("#address-input").val()
@@ -146,15 +162,21 @@ var NorthWind = (function(){
 				,fax			: $("#fax-input").val()
 			}, function(data) {	
 				if(data){
-					MsgBox.success("Saved");
-					$(".infoContainer").each(function(){
-						var info = $(this).find(".info");
-						var infoTextbox = $(this).find(".infoTextbox");
+					MsgBox.success("Saved");	
+					$(".info").each(function(){
+						var info = $(this);
+						if(info.attr("id") == "company-name"){
+							var infoTextbox = info.next();
+						}else{
+							var infoTextbox = $(this).parent().find(".infoTextbox");				
+						}
+						
 						var newInfo = infoTextbox.val() == "" ? "unspecified" : infoTextbox.val();
 						info.html(newInfo);
 						infoTextbox.hide();
-						info.show();					
-					});					
+						info.show();		
+					});	
+									
 					$("#edit-button").show();
 					$("#cancel-button").hide();
 					$("#save-button").hide();			
@@ -177,7 +199,7 @@ var NorthWind = (function(){
 		return valid;
 	}
 	
-	function checkAvailabilityEvent(){
+	function checkingAvailability(){
 		var invalidInput = "";
 		$("#customer-id-input").on("focusout keyup",function(e){
 			if(e.type == "focusout" || e.keyCode == 13){
@@ -204,7 +226,7 @@ var NorthWind = (function(){
 		});
 	}
 	
-	function addCustomerEvent(){
+	function adding(){
 		$("#add-button").click(function(){
 			var id = $("#customer-id-input").val();
 			if(validId(id)){
