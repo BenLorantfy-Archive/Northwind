@@ -150,7 +150,7 @@ var NorthWind = (function(){
 			$.post("php/customers.class.php",{ 
 				 call			: "updateCustomer"
 				,id				: $("#customer-id").html()
-				,companyName	: $("#company-name-input").val()
+				,companyName	: $("#company-name-big-input").val()
 				,contactName	: $("#contact-name-input").val()
 				,contactTitle	: $("#contact-title-input").val()
 				,address		: $("#address-input").val()

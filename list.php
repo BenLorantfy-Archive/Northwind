@@ -16,6 +16,7 @@
 <!DOCTYPE>
 <html>
 <head>
+	<title>Customers</title>
 	<?php include("php/head.php"); ?>
 </head>
 <body data-page = "list" <?php if($table === false) echo "data-error='true'"?>>

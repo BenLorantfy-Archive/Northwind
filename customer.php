@@ -24,10 +24,15 @@
 <!DOCTYPE>
 <html>
 <head>
+	<?php if($customer === false){ ?>
+			<title>Customer error</title>
+	<?php }else{ ?>
+			<title><?php echo $CompanyName; ?></title>
+	<?php } ?>
+
 	<?php include("php/head.php"); ?>
 </head>
 <body data-page = "customer" <?php if($customer === false) echo "data-error='true'"?>>
-	
 	<div id = "site-container">
 		<?php include("php/nav.php"); ?>
 		<div id = "content-container">
@@ -37,7 +42,7 @@
 				//
 				if($customer !== false){ 			
 			?>			
-				<h3 id = "company-name" class = "info"><?php echo $CompanyName; ?></h3><input id = "company-name-input" class = "infoTextbox dark-textbox" style = "display:none;" type = "text" value="<?php echo $CompanyName == "unspecified" ? "" : $CompanyName; ?>"/>
+				<h3 id = "company-name" class = "info"><?php echo $CompanyName; ?></h3><input id = "company-name-big-input" class = "infoTextbox dark-textbox" style = "display:none;" type = "text" value="<?php echo $CompanyName == "unspecified" ? "" : $CompanyName; ?>"/>
 				<h4 id = "customer-id"><?php echo $CustomerID; ?></h4>
 				
 				<div class = "infoContainer">
