@@ -1,4 +1,17 @@
 <?php
+
+/*
+ * 	FUNCTION 	: handleAJAX
+ *
+ * 	DESCRIPTION : This function is used to allow methods to be called with AJAX 
+ *				  in the same way as regular synchronous server-side calls  
+ *				  Calls method specified in the post variable named "call" and echos
+ *				  return data as json
+ *
+ *	PARAMETERS  : string class : the class method belongs to
+ *
+ * 	RETURNS 	: nothing
+ */		
 function handleAJAX($class){
 	$method = $_POST["call"];	// method to call
 	$post = $_POST;				// Don't modify the super global, instead, copy it

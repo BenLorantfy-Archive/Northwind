@@ -46,7 +46,18 @@ class Customers{
 		$this->db = connect();
 		$this->admin = new Admin();
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: generateCustomersTable
+	 *
+	 * 	DESCRIPTION : This function generates the customers table
+	 *
+	 * 	PARAMETERS 	: string requestedOrder : what to sort by
+	 *				  string search			: keywords to search
+	 *				  string reverse		: wether or not to reverse table
+	 *
+	 * 	RETURNS 	: customer table on success, false on failure
+	 */		
 	function generateCustomersTable($requestedOrder="", $search="", $reverse=""){
 		//
 		// Don't run function if db failed to connect or admin is not logged
@@ -117,6 +128,15 @@ class Customers{
 		}
 	}
 
+	/*
+	 * 	FUNCTION 	: customerData
+	 *
+	 * 	DESCRIPTION : This function gets customer data given an id
+	 *
+	 * 	PARAMETERS 	: string id : the id of the requested customer
+	 *
+	 * 	RETURNS 	: customer array on success, false on failure
+	 */	
 	function customerData($id=""){
 	
 		//
@@ -173,6 +193,15 @@ class Customers{
 		}	
 	}
 
+	/*
+	 * 	FUNCTION 	: updateCustomer
+	 *
+	 * 	DESCRIPTION : This function gets customer data given an id
+	 *
+	 * 	PARAMETERS 	: string <several> : new customer information
+	 *
+	 * 	RETURNS 	: true on success, false on failure
+	 */	
 	function updateCustomer(
 		 $id=""
 	    ,$companyName=""
@@ -227,6 +256,15 @@ class Customers{
 		return $success;	
 	}
 
+	/*
+	 * 	FUNCTION 	: checkAvailability
+	 *
+	 * 	DESCRIPTION : This function checks if the id belongs to a customer that already exists
+	 *
+	 * 	PARAMETERS 	: string <several> : new customer information
+	 *
+	 * 	RETURNS 	: true if available, false otherwise
+	 */	
 	function checkAvailability($id=""){
 		//
 		// Don't continue if db failed to connect or admin is not logged
@@ -262,6 +300,15 @@ class Customers{
 		
 	}
 
+	/*
+	 * 	FUNCTION 	: addCustomer
+	 *
+	 * 	DESCRIPTION : This function adds a customer to the customer table
+	 *
+	 * 	PARAMETERS 	: string <several> : customer information
+	 *
+	 * 	RETURNS 	: true on success, false on failure
+	 */	
 	function addCustomer(
 		 $id=""
 		,$companyName=""
