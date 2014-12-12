@@ -1,7 +1,25 @@
+/*
+ *
+ * NAME 	: NorthWind
+ *
+ * PURPOSE 	: Contains user interface code and AJAX code for Northwind web app
+ *			  Uses the js module design pattern
+ *
+ */
 var NorthWind = (function(){
 	/* ---------------
 	 *    Public
 	 * --------------- */	
+
+	/*
+	 * 	FUNCTION 	: run
+	 *
+	 * 	DESCRIPTION : Starts the app, adds appropiate event listeners depending on the page, displays error if one occured
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */	
 	function run(){
 		//
 		// Initilize Events
@@ -33,6 +51,16 @@ var NorthWind = (function(){
 	/* ---------------
 	 *    Private
 	 * --------------- */			
+
+	/*
+	 * 	FUNCTION 	: loggingIn
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to log in
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */	
 	function loggingIn(){
 		$("#login-button").click(login);
 		$(document).keydown(function(e){
@@ -55,11 +83,29 @@ var NorthWind = (function(){
 			},"json");			
 		}			
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: clearInput
+	 *
+	 * 	DESCRIPTION : Clears all input elements
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */		
 	function clearInput(){
 		$("input").val("");
 	}
 	
+	/*
+	 * 	FUNCTION 	: displayingRecords
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to display customer records
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */	
 	function displayingRecords(){
 		var order = "CompanyName";
 		var search = "";
@@ -113,7 +159,16 @@ var NorthWind = (function(){
 			},"json")
 		}
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: editing
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to edit a customer
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */		
 	function editing(){
 		$("#edit-button").click(function(){
 			$(".info").hide();
@@ -124,6 +179,15 @@ var NorthWind = (function(){
 		})
 	}
 
+	/*
+	 * 	FUNCTION 	: canceling
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to cancel editing a customer
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */		
 	function canceling(){
 		$("#cancel-button").click(function(){
 			$(".info").each(function(){
@@ -144,7 +208,16 @@ var NorthWind = (function(){
 			$("#save-button").hide();
 		});
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: saving
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to save customer changes
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */		
 	function saving(){
 		$("#save-button").click(function(){
 			$.post("php/customers.class.php",{ 
@@ -186,7 +259,16 @@ var NorthWind = (function(){
 			},"json");			
 		})
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: validId
+	 *
+	 * 	DESCRIPTION : checks wether an id is valid
+	 *
+	 * 	PARAMETERS 	: string id : id to check validity of
+	 *
+	 * 	RETURNS 	: nothing
+	 */		
 	function validId(id){
 		var valid = true;
 		if(id.length > 5){
@@ -198,7 +280,16 @@ var NorthWind = (function(){
 		}
 		return valid;
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: checkingAvailability
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to check if id is available
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */		
 	function checkingAvailability(){
 		var invalidInput = "";
 		$("#customer-id-input").on("focusout keyup",function(e){
@@ -225,7 +316,16 @@ var NorthWind = (function(){
 			}			
 		});
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: adding
+	 *
+	 * 	DESCRIPTION : Starts user interface events required to add customer
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: nothing
+	 */			
 	function adding(){
 		$("#add-button").click(function(){
 			var id = $("#customer-id-input").val();
@@ -256,11 +356,17 @@ var NorthWind = (function(){
 		})
 	}
 
+	//
+	// Returns the public methods as an object so they are accessible
+	//
 	return {
 		run:run
 	}
 })();
 
+//
+// Runs app when DOM is ready to be accessed
+//
 $(document).ready(function(){
 	NorthWind.run();
 });

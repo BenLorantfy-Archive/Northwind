@@ -40,7 +40,17 @@ class Admin{
 	function __construct(){
 		$this->db = connect();
 	}
-	
+
+	/*
+	 * 	FUNCTION 	: login
+	 *
+	 * 	DESCRIPTION : This function calculates tax on a retail purchase in Ontario.
+	 *
+	 * 	PARAMETERS 	: string name     : username
+	 *				 string password : user password
+	 *
+	 * 	RETURNS 	: true on success, false on failure
+	 */	
 	function login($name="",$password=""){
 		if($db->connect_errno > 0) return false;
 		
@@ -67,6 +77,15 @@ class Admin{
 		return $success;
 	}
 	
+	/*
+	 * 	FUNCTION 	: isLogged
+	 *
+	 * 	DESCRIPTION : This function tests if user is currently logged in
+	 *
+	 * 	PARAMETERS 	: none
+	 *
+	 * 	RETURNS 	: true if user is logged in, false if not
+	 */	
 	function isLogged(){
 		if($db->connect_errno > 0) return false;
 		
